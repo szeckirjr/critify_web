@@ -1,6 +1,6 @@
 import { Element } from "cheerio";
 import * as cheerio from "cheerio";
-import axios, { CancelToken } from "axios";
+import axios from "axios";
 
 const artists_to_ignore = ["christopher-atkins"];
 
@@ -36,7 +36,8 @@ export type AwaitingReview = {
 
 export type Album = {
   name: string;
-  score: number | AwaitingReview;
+  score: number;
+  awaitingReview: AwaitingReview;
   releaseDate: string;
   image: string;
   criticReviewCount: number;
@@ -239,15 +240,16 @@ async function getUserReviews(albumName: string, artistName: string) {
  * @returns
  */
 
-export async function getAlbumInfo(
-  albumName: string,
-  artistName: string,
-  cancelToken: CancelToken
-) {
+export async function getAlbumInfo(albumName: string, artistName: string) {
   //console.log('getAlbumInfo', albumName, artistName);
   const albumInfo: Album = {
     name: "",
     score: 0,
+    awaitingReview: {
+      reviewCount: 0,
+      awaitingCount: 0,
+      description: "",
+    },
     releaseDate: "",
     image: "",
     criticReviewCount: 0,
@@ -275,21 +277,22 @@ export async function getAlbumInfo(
     url = url_to_fix[url as keyof typeof url_to_fix];
   }
   try {
-    const { data } = await axios.get(url, { cancelToken });
+    const { data } = await axios.get(url);
     const $ = cheerio.load(data);
 
     albumInfo.name = $(".product_title a span h1").text();
 
-    let tempScore: number | AwaitingReview = $(
+    albumInfo.score = $(
       ".main_details .score_summary .metascore_w span"
     ).text() as unknown as number;
-    if (!tempScore) {
+
+    if (!albumInfo.score) {
       const awaitingCount = $(
         ".main_details .score_summary .summary .connect4_msg"
       )
         .text()
         .match(/Awaiting (\d)* more review/);
-      tempScore = {
+      albumInfo.awaitingReview = {
         awaitingCount: awaitingCount
           ? (awaitingCount[1] as unknown as number)
           : 0,
@@ -301,7 +304,6 @@ export async function getAlbumInfo(
           .trim(),
       };
     }
-    albumInfo.score = tempScore;
 
     albumInfo.releaseDate = $(
       "#main .product_split .left .product_content_head .product_data .release"
@@ -370,23 +372,7 @@ export async function getAlbumInfo(
   } catch (err) {
     //console.log(url);
     //console.log(err);
-    return {
-      name: albumName,
-      score: 0,
-      releaseDate: "No release date found",
-      image:
-        "https://www.escapeauthority.com/wp-content/uploads/2116/11/No-image-found.jpg",
-      criticReviewCount: 0,
-      userScore: 0,
-      userRatingCount: 0,
-      summary: "",
-      recordLabel: "",
-      genres: [],
-      awardsAndRankings: [],
-      criticReviews: [],
-      userReviews: [],
-      status: "error",
-    };
+    return undefined;
   }
 }
 

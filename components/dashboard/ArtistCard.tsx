@@ -67,7 +67,7 @@ const ArtistCard = ({
     <ScaleHover>
       <Box
         className="fade-up"
-        flex="none"
+        flex={index === 2 ? 3 : "none"}
         height={150}
         width={150}
         bgcolor="pink"
@@ -99,7 +99,7 @@ const ArtistCard = ({
           borderRadius={2}
           sx={{
             backgroundImage: !metaInfo?.avgCareerScore
-              ? "linear-gradient(180deg, rgba(131, 131, 131, 0.9), rgba(131, 131, 131, 0.9))"
+              ? "linear-gradient(180deg, rgba(75, 75, 75, 0.9), rgba(75, 75, 75, 0.9))"
               : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)",
           }}
         >
