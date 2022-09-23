@@ -1,4 +1,4 @@
-import { Button, Typography, Stack, useTheme } from "@mui/material";
+import { Button, Typography, Stack, useTheme, Box } from "@mui/material";
 import { NextPage } from "next";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
@@ -84,6 +84,27 @@ const Login: NextPage = () => {
       >
         Sign In
       </Button>
+      <a href="https://wardo.dev/" target="_blank" rel="noreferrer">
+        <Box
+          sx={{
+            opacity: 0.3,
+            cursor: "pointer",
+            "&:hover": {
+              opacity: 0.8,
+            },
+          }}
+        >
+          <Typography
+            mt={8}
+            className="fade-up"
+            fontSize={18}
+            fontWeight="bold"
+            color="white"
+          >
+            by wardo.dev
+          </Typography>
+        </Box>
+      </a>
     </Stack>
   );
 };
