@@ -1,8 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import ScaleHover from "../ScaleHover";
-import { Album, Artist, getAlbumInfo, getArtist } from "../../lib/scraper";
+import { Artist } from "../../lib/scraper";
 
 const ArtistCard = ({
   artist,
@@ -112,8 +112,7 @@ const ArtistCard = ({
             }}
             color="white"
           >
-            {index + 1}. {artist.name}{" "}
-            {metaInfo && (metaInfo as any).avgCareerScore}
+            {index + 1}. {artist.name}
           </Typography>
         </Box>
       </Box>

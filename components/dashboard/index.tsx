@@ -1,6 +1,5 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import { gsap } from "gsap";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { MyUser } from "../../types/types";
 import DashboardHeader from "./DashboardHeader";
 import SavedAlbums from "./SavedAlbums";
@@ -64,8 +63,7 @@ const Dashboard = ({
             color="white"
             ref={mainTypeRef}
           >
-            {/* {type === "artists" ? "Top Artists" : "Saved Albums"} */}
-            Top Artists
+            {type === "artists" ? "Top Artists" : "Saved Albums"}
           </Typography>
           <Box
             sx={{
@@ -88,8 +86,7 @@ const Dashboard = ({
                 },
               }}
             >
-              {/* {type === "artists" ? "Saved Albums" : "Top Artists"} */}
-              Saved Albums
+              {type === "artists" ? "Saved Albums" : "Top Artists"}
             </Typography>
           </Box>
         </Stack>
