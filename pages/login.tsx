@@ -1,64 +1,43 @@
-import { ApolloError, gql, useQuery } from "@apollo/client";
-import {
-  Button,
-  Icon,
-  Stack,
-  SvgIcon,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import React, { useEffect, useRef } from "react";
-import SpotifyIcon from "../../icons/SpotifyIcon";
-import { gsap } from "gsap";
+import { Button, Typography, Stack, useTheme } from "@mui/material";
+import { NextPage } from "next";
+import { signIn } from "next-auth/react";
+import Image from "next/image";
+import { useEffect } from "react";
+import gsap from "gsap";
 
-const LoginPage = (): JSX.Element => {
-  const email = "adrianaszeckir@gmail.com";
-  const password = "adriana10aaaa";
-
-  const [data, setData] = React.useState<any>(undefined);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<ApolloError | undefined>(undefined);
-
+const Login: NextPage = () => {
   const handleLogin = () => {
-    const SIGN_IN = gql`
-      query SignIn($email: String!, $password: String!) {
-        signIn(email: $email, password: $password) {
-          status
-          message
-        }
-      }
-    `;
-    const { data, loading, error } = useQuery(SIGN_IN, {
-      variables: { email, password },
+    signIn("spotify", {
+      callbackUrl: process.env.CALLBACK_URL ?? "http://localhost:3000",
     });
-    setData(data);
-    setLoading(loading);
-    setError(error);
   };
-
-  console.log(data, loading, error);
-
-  const theme = useTheme();
 
   useEffect(() => {
     gsap.fromTo(
       ".fade-up",
       { opacity: 0, y: 200 },
-      { opacity: 1, y: 0, duration: 1.5, delay: 0.5, stagger: 0.5 }
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1.5,
+        stagger: 0.4,
+        ease: "circ",
+      }
     );
   });
 
+  const theme = useTheme();
   return (
     <Stack
       direction="column"
       gap={3}
       bgcolor={theme.spotify.black}
       minHeight="100vh"
+      alignItems="center"
       justifyContent="center"
     >
       <Typography
         className="fade-up"
-        mx="auto"
         fontSize={56}
         fontWeight="bold"
         color={theme.spotify.green}
@@ -78,19 +57,14 @@ const LoginPage = (): JSX.Element => {
         className="fade-up"
         variant="contained"
         startIcon={
-          // <SpotifyIcon
-          //   sx={{
-          //     height: 30,
-          //     width: 30,
-          //   }}
-          // />
-          <img
+          <Image
+            alt="Spotify Icon"
             src="/spotify-icon.svg"
+            height={30}
+            width={30}
             style={{
               filter:
                 "invert(100%) sepia(5%) saturate(7500%) hue-rotate(283deg) brightness(108%) contrast(111%)",
-              height: 30,
-              width: 30,
             }}
           />
         }
@@ -106,11 +80,12 @@ const LoginPage = (): JSX.Element => {
             bgcolor: theme.spotify.darkGreen,
           },
         }}
+        onClick={handleLogin}
       >
-        Login with Spotify
+        Sign In
       </Button>
     </Stack>
   );
 };
 
-export default LoginPage;
+export default Login;

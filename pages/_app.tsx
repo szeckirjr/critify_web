@@ -8,6 +8,8 @@ import {
   InMemoryCache,
 } from "@apollo/client";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { SessionProvider } from "next-auth/react";
+import { Session } from "next-auth";
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000",
@@ -44,11 +46,18 @@ const theme = createTheme({
   },
 });
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{
+  session: Session;
+}>) {
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
+        <SessionProvider session={pageProps.session}>
+          <Component {...pageProps} />
+        </SessionProvider>
       </ThemeProvider>
     </ApolloProvider>
   );
