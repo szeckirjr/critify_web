@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
 import gsap from "gsap";
 import ScaleHover from "../ScaleHover";
+import CustomEase from "gsap/CustomEase";
 
 const ArtistCard = ({
   artist,
@@ -12,19 +13,25 @@ const ArtistCard = ({
 }): JSX.Element => {
   useEffect(() => {
     gsap.fromTo(
-      ".fade-right",
-      { opacity: 0, scale: 0.2 },
+      ".fade-up",
+      { opacity: 0, y: 100 },
       {
         opacity: 1,
-        scale: 1,
-        duration: 1.5,
+        y: 0,
+        duration: 0.5,
         ease: "slow",
+        // ease: CustomEase.create(
+        //   "custom",
+        //   "M0,0 C0,0 0.071,0.189 0.136,0.288 0.384,0.665 0.202,0.914 0.476,1.17 0.613,1.298 0.648,0.976 0.762,0.924 0.937,0.843 1,1 1,1 "
+        // ),
+        stagger: 0.04,
       }
     );
-  });
+  }, [artist, index]);
   return (
     <ScaleHover>
       <Box
+        className="fade-up"
         flex="none"
         height={150}
         width={150}

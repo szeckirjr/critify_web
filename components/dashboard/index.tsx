@@ -1,9 +1,20 @@
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
-import { MyUser } from "../../types/types";
+import { useState } from "react";
+import { MyUser, Range } from "../../types/types";
 import AlbumCard from "./AlbumCard";
 import ArtistCard from "./ArtistCard";
+import DashboardHeader from "./DashboardHeader";
+import SavedAlbums from "./SavedAlbums";
+import TopArtists from "./TopArtists";
 
 type Props = {
   user: MyUser;
@@ -21,94 +32,122 @@ const Dashboard = ({
   savedAlbums,
 }: Props) => {
   const theme = useTheme();
+  const [type, setType] = useState<"artists" | "albums">("artists");
+  const [range, setRange] = useState<"long" | "medium" | "short">("long");
   return (
     <Stack bgcolor={theme.spotify.black} p={3} minHeight="100vh">
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Box
-          onClick={() => window.location.reload()}
-          sx={{
-            cursor: "pointer",
-          }}
-        >
-          <Typography
-            fontSize={50}
-            fontWeight="bold"
-            color={theme.spotify.green}
-          >
-            Dashboard
+      <DashboardHeader user={user} />
+      <Stack direction="row" justifyContent="space-between">
+        <Stack direction="row" gap={1}>
+          <Typography fontSize={36} fontWeight="bold" color="white">
+            {type === "artists" ? "Top Artists" : "Saved Albums"}
           </Typography>
-        </Box>
-        <Stack gap={1} alignItems="center">
           <Box
-            bgcolor={"green"}
-            overflow="hidden"
-            width={50}
-            height={50}
-            borderRadius={10}
-          >
-            <Image
-              alt="User Profile Picture"
-              width={50}
-              height={50}
-              src={user.image ?? ""}
-            />
-          </Box>
-          <Button
-            variant="contained"
-            onClick={() => signOut()}
             sx={{
-              paddingX: 2,
-              paddingY: 1,
-              backgroundColor: "transparent",
-              color: theme.spotify.green,
-              "&:hover": {
-                backgroundColor: theme.spotify.green,
-                color: "white",
-              },
-              boxShadow: "none",
+              cursor: "pointer",
             }}
-            color="inherit"
           >
-            Sign Out
-          </Button>
-        </Stack>
-      </Stack>
-      <Stack gap={4}>
-        <Box>
-          <Typography fontSize={36} fontWeight="bold" color="white">
-            Your Saved Albums
-          </Typography>
-          <Stack direction="row" gap={3} overflow="scroll" p={2}>
-            {savedAlbums?.items?.map(
-              (release: SpotifyApi.SavedAlbumObject, idx: number) => (
-                <AlbumCard
-                  key={release.album.id}
-                  album={release.album}
-                  index={idx}
-                />
-              )
-            )}
-          </Stack>
-        </Box>
-        <Box>
-          <Typography fontSize={36} fontWeight="bold" color="white">
-            Top Artists
-          </Typography>
-          <Box
-            display="flex"
-            gap={4}
-            flexWrap="wrap"
-            justifyContent="flex-start"
-            p={1}
-          >
-            {topArtistsLongTerm?.items?.map(
-              (release: SpotifyApi.ArtistObjectFull, idx: number) => (
-                <ArtistCard key={release.id} artist={release} index={idx} />
-              )
-            )}
+            <Typography
+              fontSize={36}
+              fontWeight="bold"
+              color="white"
+              onClick={() =>
+                setType((prev) => (prev === "artists" ? "albums" : "artists"))
+              }
+              sx={{
+                opacity: 0.3,
+                transition: "opacity 0.3s",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+              }}
+            >
+              {type === "artists" ? "Saved Albums" : "Top Artists"}
+            </Typography>
           </Box>
-        </Box>
+        </Stack>
+        {type === "artists" && (
+          <Stack
+            direction="row"
+            gap={1}
+            divider={
+              <Typography
+                fontSize={36}
+                fontWeight="bold"
+                color="white"
+                sx={{
+                  opacity: 0.3,
+                  transition: "opacity 0.3s",
+                  "&:hover": {
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                |
+              </Typography>
+            }
+          >
+            <Typography
+              onClick={() => setRange("long")}
+              fontSize={36}
+              fontWeight="bold"
+              color="white"
+              sx={{
+                cursor: "pointer",
+                opacity: range === "long" ? 1 : 0.3,
+                transition: "opacity 0.3s",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+              }}
+            >
+              All Time
+            </Typography>
+            <Typography
+              onClick={() => setRange("medium")}
+              fontSize={36}
+              fontWeight="bold"
+              color="white"
+              sx={{
+                cursor: "pointer",
+                opacity: range === "medium" ? 1 : 0.3,
+                transition: "opacity 0.3s",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+              }}
+            >
+              Last 6 Months
+            </Typography>
+            <Typography
+              onClick={() => setRange("short")}
+              fontSize={36}
+              fontWeight="bold"
+              color="white"
+              sx={{
+                cursor: "pointer",
+                opacity: range === "short" ? 1 : 0.3,
+                transition: "opacity 0.3s",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+              }}
+            >
+              Last 4 Weeks
+            </Typography>
+          </Stack>
+        )}
       </Stack>
+      {type === "albums" ? (
+        <SavedAlbums savedAlbums={savedAlbums.items} />
+      ) : (
+        <TopArtists
+          topArtistsLongTerm={topArtistsLongTerm.items}
+          topArtistsMediumTerm={topArtistsMediumTerm.items}
+          topArtistsShortTerm={topArtistsShortTerm.items}
+          range={range}
+        />
+      )}
     </Stack>
   );
 };

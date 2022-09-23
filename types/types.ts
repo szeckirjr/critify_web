@@ -1,5 +1,7 @@
 import { DefaultSession } from "next-auth/core/types";
 
+export type Range = "short" | "medium" | "long";
+
 export interface MyUser {
   name?: string | null;
   email?: string | null;

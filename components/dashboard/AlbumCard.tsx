@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import gsap from "gsap";
-import { AddBox } from "@mui/icons-material";
 import ScaleHover from "../ScaleHover";
 
 const AlbumCard = ({
@@ -13,13 +12,14 @@ const AlbumCard = ({
 }): JSX.Element => {
   useEffect(() => {
     gsap.fromTo(
-      ".fade-right",
-      { opacity: 0, scale: 0.2 },
+      ".fade-up",
+      { opacity: 0, y: 100 },
       {
         opacity: 1,
-        scale: 1,
-        duration: 1.5,
+        y: 0,
+        duration: 0.5,
         ease: "slow",
+        stagger: 0.04,
       }
     );
   }, []);
@@ -27,6 +27,7 @@ const AlbumCard = ({
   return (
     <ScaleHover>
       <Box
+        className="fade-up"
         flex="none"
         height={150}
         width={150}
