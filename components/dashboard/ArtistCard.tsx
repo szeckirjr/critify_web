@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import gsap from "gsap";
 import ScaleHover from "../ScaleHover";
+import { Album, Artist, getAlbumInfo, getArtist } from "../../lib/scraper";
 
 const ArtistCard = ({
   artist,
@@ -10,6 +11,23 @@ const ArtistCard = ({
   artist: SpotifyApi.ArtistObjectFull;
   index: number;
 }): JSX.Element => {
+  const [metaInfo, setMetaInfo] = useState<Artist>();
+  // useEffect(() => {
+  //   getArtist(artist.name).then((res) => {
+  //     setMetaInfo(res as Artist);
+  //   });
+  // }, [artist]);
+
+  useEffect(() => {
+    fetch(`/api/artist/${artist.name}`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setMetaInfo(res.artist);
+      });
+  }, [artist]);
+
   useEffect(() => {
     gsap.fromTo(
       ".fade-up",
@@ -27,6 +45,24 @@ const ArtistCard = ({
       }
     );
   }, [artist, index]);
+
+  const [scoreColor, setScoreColor] = useState<
+    "#D2222D" | "#FFBF00" | "#008000" | "gray"
+  >("gray");
+
+  useEffect(() => {
+    if (!metaInfo?.avgCareerScore) setScoreColor("gray");
+    if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 70) {
+      setScoreColor("#008000");
+    } else if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 50) {
+      setScoreColor("#FFBF00");
+    } else if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 30) {
+      setScoreColor("#D2222D");
+    } else {
+      setScoreColor("gray");
+    }
+  }, [metaInfo]);
+
   return (
     <ScaleHover>
       <Box
@@ -44,14 +80,27 @@ const ArtistCard = ({
         display="flex"
       >
         <Box
+          px={1}
+          borderRadius={2}
+          position="absolute"
+          right={8}
+          top={3}
+          bgcolor={scoreColor}
+        >
+          <Typography fontSize={28} fontWeight="medium">
+            {metaInfo?.avgCareerScore}
+          </Typography>
+        </Box>
+        <Box
           flex={1}
           display="flex"
           flexDirection="column"
           justifyContent="flex-end"
           borderRadius={2}
           sx={{
-            backgroundImage:
-              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)",
+            backgroundImage: !metaInfo?.avgCareerScore
+              ? "linear-gradient(180deg, rgba(131, 131, 131, 0.9), rgba(131, 131, 131, 0.9))"
+              : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)",
           }}
         >
           <Typography
@@ -63,7 +112,8 @@ const ArtistCard = ({
             }}
             color="white"
           >
-            {index + 1}. {artist.name}
+            {index + 1}. {artist.name}{" "}
+            {metaInfo && (metaInfo as any).avgCareerScore}
           </Typography>
         </Box>
       </Box>

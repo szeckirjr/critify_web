@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import AlbumCard from "./AlbumCard";
 
 const SavedAlbums = ({
@@ -6,6 +6,7 @@ const SavedAlbums = ({
 }: {
   savedAlbums: SpotifyApi.SavedAlbumObject[];
 }): JSX.Element => {
+  console.log(savedAlbums);
   return (
     <Box>
       {/* <Stack direction="row" gap={3} overflow="scroll" p={2}> */}

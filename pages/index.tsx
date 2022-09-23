@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     session
   );
 
-  const savedAlbums: SpotifyApi.AlbumObjectFull = await customGet(
+  const savedAlbums = await customGet(
     "https://api.spotify.com/v1/me/albums?limit=50",
     session
   );

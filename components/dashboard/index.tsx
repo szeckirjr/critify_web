@@ -5,7 +5,7 @@ import { MyUser } from "../../types/types";
 import DashboardHeader from "./DashboardHeader";
 import SavedAlbums from "./SavedAlbums";
 import TopArtists from "./TopArtists";
-import { TextPlugin } from "gsap/TextPlugin";
+// import { TextPlugin } from "gsap/TextPlugin";
 
 type Props = {
   user: MyUser;
@@ -28,30 +28,30 @@ const Dashboard = ({
 
   const mainTypeRef = useRef<HTMLSpanElement>(null);
   const subTypeRef = useRef<HTMLSpanElement>(null);
-  gsap.registerPlugin(TextPlugin);
+  //   gsap.registerPlugin(TextPlugin);
 
-  useEffect(() => {
-    console.log("type changed", type);
-    if (type === "artists") {
-      gsap.to(mainTypeRef.current, {
-        duration: 1,
-        text: "Top Artists",
-      });
-      gsap.to(subTypeRef.current, {
-        duration: 1,
-        text: "Saved Albums",
-      });
-    } else {
-      gsap.to(mainTypeRef.current, {
-        duration: 1,
-        text: "Saved Albums",
-      });
-      gsap.to(subTypeRef.current, {
-        duration: 1,
-        text: "Top Artists",
-      });
-    }
-  }, [type]);
+  //   useEffect(() => {
+  //     console.log("type changed", type);
+  //     if (type === "artists") {
+  //       gsap.to(mainTypeRef.current, {
+  //         duration: 1,
+  //         text: "Top Artists",
+  //       });
+  //       gsap.to(subTypeRef.current, {
+  //         duration: 1,
+  //         text: "Saved Albums",
+  //       });
+  //     } else {
+  //       gsap.to(mainTypeRef.current, {
+  //         duration: 1,
+  //         text: "Saved Albums",
+  //       });
+  //       gsap.to(subTypeRef.current, {
+  //         duration: 1,
+  //         text: "Top Artists",
+  //       });
+  //     }
+  //   }, [type]);
 
   return (
     <Stack bgcolor={theme.spotify.black} p={3} minHeight="100vh">
