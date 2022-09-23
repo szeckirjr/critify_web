@@ -1,20 +1,11 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { signOut } from "next-auth/react";
-import Image from "next/image";
-import { useState } from "react";
-import { MyUser, Range } from "../../types/types";
-import AlbumCard from "./AlbumCard";
-import ArtistCard from "./ArtistCard";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
+import { MyUser } from "../../types/types";
 import DashboardHeader from "./DashboardHeader";
 import SavedAlbums from "./SavedAlbums";
 import TopArtists from "./TopArtists";
+import { TextPlugin } from "gsap/TextPlugin";
 
 type Props = {
   user: MyUser;
@@ -34,13 +25,47 @@ const Dashboard = ({
   const theme = useTheme();
   const [type, setType] = useState<"artists" | "albums">("artists");
   const [range, setRange] = useState<"long" | "medium" | "short">("long");
+
+  const mainTypeRef = useRef<HTMLSpanElement>(null);
+  const subTypeRef = useRef<HTMLSpanElement>(null);
+  gsap.registerPlugin(TextPlugin);
+
+  useEffect(() => {
+    console.log("type changed", type);
+    if (type === "artists") {
+      gsap.to(mainTypeRef.current, {
+        duration: 1,
+        text: "Top Artists",
+      });
+      gsap.to(subTypeRef.current, {
+        duration: 1,
+        text: "Saved Albums",
+      });
+    } else {
+      gsap.to(mainTypeRef.current, {
+        duration: 1,
+        text: "Saved Albums",
+      });
+      gsap.to(subTypeRef.current, {
+        duration: 1,
+        text: "Top Artists",
+      });
+    }
+  }, [type]);
+
   return (
     <Stack bgcolor={theme.spotify.black} p={3} minHeight="100vh">
       <DashboardHeader user={user} />
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="row" gap={1}>
-          <Typography fontSize={36} fontWeight="bold" color="white">
-            {type === "artists" ? "Top Artists" : "Saved Albums"}
+          <Typography
+            fontSize={36}
+            fontWeight="bold"
+            color="white"
+            ref={mainTypeRef}
+          >
+            {/* {type === "artists" ? "Top Artists" : "Saved Albums"} */}
+            Top Artists
           </Typography>
           <Box
             sx={{
@@ -48,6 +73,7 @@ const Dashboard = ({
             }}
           >
             <Typography
+              ref={subTypeRef}
               fontSize={36}
               fontWeight="bold"
               color="white"
@@ -62,7 +88,8 @@ const Dashboard = ({
                 },
               }}
             >
-              {type === "artists" ? "Saved Albums" : "Top Artists"}
+              {/* {type === "artists" ? "Saved Albums" : "Top Artists"} */}
+              Saved Albums
             </Typography>
           </Box>
         </Stack>

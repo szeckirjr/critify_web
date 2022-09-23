@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Icon, { IconProps } from "@mui/material/Icon/Icon";
-import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
+import Image from "next/image";
 
 const SpotifyIcon = (props: IconProps) => (
   <Box>
@@ -10,7 +10,8 @@ const SpotifyIcon = (props: IconProps) => (
         textAlign: "center",
       }}
     >
-      <img
+      <Image
+        alt="Spotify Logo"
         src="/spotify-icon.svg"
         style={{
           display: "flex",

@@ -5,10 +5,8 @@ import ScaleHover from "../ScaleHover";
 
 const AlbumCard = ({
   album,
-  index,
 }: {
   album: SpotifyApi.AlbumObjectFull;
-  index: number;
 }): JSX.Element => {
   useEffect(() => {
     gsap.fromTo(
@@ -60,7 +58,7 @@ const AlbumCard = ({
             }}
             color="white"
           >
-            {index + 1}. {album.name}
+            {album.name}
           </Typography>
         </Box>
       </Box>

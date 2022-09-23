@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import AlbumCard from "./AlbumCard";
 
 const SavedAlbums = ({
@@ -10,11 +10,9 @@ const SavedAlbums = ({
     <Box>
       {/* <Stack direction="row" gap={3} overflow="scroll" p={2}> */}
       <Box display="flex" gap={4} flexWrap="wrap">
-        {savedAlbums?.map(
-          ({ album }: SpotifyApi.SavedAlbumObject, idx: number) => (
-            <AlbumCard key={album.id} album={album} index={idx} />
-          )
-        )}
+        {savedAlbums?.map(({ album }: SpotifyApi.SavedAlbumObject) => (
+          <AlbumCard key={album.id} album={album} />
+        ))}
       </Box>
       {/* </Stack> */}
     </Box>

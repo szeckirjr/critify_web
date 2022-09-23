@@ -2,7 +2,6 @@ import { Box, Typography } from "@mui/material";
 import { useEffect } from "react";
 import gsap from "gsap";
 import ScaleHover from "../ScaleHover";
-import CustomEase from "gsap/CustomEase";
 
 const ArtistCard = ({
   artist,

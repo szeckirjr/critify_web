@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import { useState } from "react";
 import { Range } from "../../types/types";
 import ArtistCard from "./ArtistCard";
 
