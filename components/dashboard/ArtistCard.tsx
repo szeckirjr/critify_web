@@ -85,6 +85,7 @@ const ArtistCard = ({
           position="absolute"
           right={8}
           top={3}
+          color="white"
           bgcolor={scoreColor}
         >
           <Typography fontSize={28} fontWeight="medium">

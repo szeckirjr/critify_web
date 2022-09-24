@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import gsap from "gsap";
 import ScaleHover from "../ScaleHover";
@@ -10,6 +10,7 @@ const AlbumCard = ({
   album: SpotifyApi.AlbumObjectFull;
 }): JSX.Element => {
   const [metaInfo, setMetaInfo] = useState<Album>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetch(`/api/album/${album.artists[0].name}/${album.name}`, {
@@ -18,8 +19,11 @@ const AlbumCard = ({
       .then((res) => res.json())
       .then((res) => {
         setMetaInfo(res.album);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [album]);
+  }, [album.artists, album.name]);
 
   const [scoreColor, setScoreColor] = useState<
     "#D2222D" | "#FFBF00" | "#008000" | "gray"
@@ -73,12 +77,17 @@ const AlbumCard = ({
           borderRadius={2}
           position="absolute"
           right={8}
-          top={3}
-          bgcolor={scoreColor}
+          top={8}
+          color="white"
+          bgcolor={loading ? "transparent" : scoreColor}
         >
-          <Typography fontSize={28} fontWeight="medium">
-            {metaInfo?.score}
-          </Typography>
+          {!loading ? (
+            <Typography fontSize={28} fontWeight="medium">
+              {metaInfo?.score}
+            </Typography>
+          ) : (
+            <CircularProgress color="inherit" size={28} />
+          )}
         </Box>
         <Box
           flex={1}
