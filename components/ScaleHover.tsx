@@ -2,7 +2,13 @@ import { Box } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
-const ScaleHover = ({ children }: { children: JSX.Element }): JSX.Element => {
+const ScaleHover = ({
+  children,
+  disable,
+}: {
+  children: JSX.Element;
+  disable: boolean;
+}): JSX.Element => {
   const [raised, setRaised] = useState(false);
   const cardRef = useRef();
   useEffect(() => {
@@ -24,7 +30,9 @@ const ScaleHover = ({ children }: { children: JSX.Element }): JSX.Element => {
       });
     }
   }, [raised]);
-  return (
+  return disable ? (
+    children
+  ) : (
     <Box
       bgcolor="transparent"
       ref={cardRef}

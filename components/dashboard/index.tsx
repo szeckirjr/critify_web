@@ -4,10 +4,13 @@ import { MyUser } from "../../types/types";
 import DashboardHeader from "./DashboardHeader";
 import SavedAlbums from "./SavedAlbums";
 import TopArtists from "./TopArtists";
+import Image from "next/image";
+import ScoreCard from "./ScoreCard";
 // import { TextPlugin } from "gsap/TextPlugin";
 
 type Props = {
   user: MyUser;
+  spotifyUser: SpotifyApi.CurrentUsersProfileResponse;
   topArtistsLongTerm: SpotifyApi.UsersTopArtistsResponse;
   topArtistsMediumTerm: SpotifyApi.UsersTopArtistsResponse;
   topArtistsShortTerm: SpotifyApi.UsersTopArtistsResponse;
@@ -16,6 +19,7 @@ type Props = {
 
 const Dashboard = ({
   user,
+  spotifyUser,
   topArtistsLongTerm,
   topArtistsMediumTerm,
   topArtistsShortTerm,
@@ -55,6 +59,31 @@ const Dashboard = ({
   return (
     <Stack bgcolor={theme.spotify.black} p={3} minHeight="100vh">
       <DashboardHeader user={user} />
+      <Stack direction="row" gap={2}>
+        <ScoreCard
+          size={200}
+          imageUrl={spotifyUser.images ? spotifyUser.images[0].url : ""}
+          loading={false}
+          title={user.name ?? ""}
+          disableHover
+        />
+        <Image
+          alt="User Profile Picture"
+          width={200}
+          style={{ borderRadius: 12 }}
+          height={200}
+          src={(user && user.image) ?? ""}
+        />
+        <Stack>
+          <Typography
+            fontSize={38}
+            fontWeight="bold"
+            color={theme.spotify.green}
+          >
+            {(user && user.name) ?? "Anonymous"}
+          </Typography>
+        </Stack>
+      </Stack>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="row" gap={1}>
           <Typography

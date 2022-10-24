@@ -89,10 +89,15 @@ const Login: NextPage = () => {
           sx={{
             opacity: 0.3,
             cursor: "pointer",
+            transition: "opacity 0.3s ease",
             "&:hover": {
               opacity: 0.8,
             },
+            transform: "translateX(-50%)",
           }}
+          bottom={15}
+          position="fixed"
+          //   left="50%"
         >
           <Typography
             mt={8}

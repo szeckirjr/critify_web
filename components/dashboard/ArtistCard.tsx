@@ -1,8 +1,7 @@
-import { Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import gsap from "gsap";
-import ScaleHover from "../ScaleHover";
 import { Artist } from "../../lib/scraper";
+import ScoreCard from "./ScoreCard";
 
 const ArtistCard = ({
   artist,
@@ -12,6 +11,7 @@ const ArtistCard = ({
   index: number;
 }): JSX.Element => {
   const [metaInfo, setMetaInfo] = useState<Artist>();
+  const [loading, setLoading] = useState<boolean>(true);
   // useEffect(() => {
   //   getArtist(artist.name).then((res) => {
   //     setMetaInfo(res as Artist);
@@ -25,6 +25,9 @@ const ArtistCard = ({
       .then((res) => res.json())
       .then((res) => {
         setMetaInfo(res.artist);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [artist]);
 
@@ -46,79 +49,19 @@ const ArtistCard = ({
     );
   }, [artist, index]);
 
-  const [scoreColor, setScoreColor] = useState<
-    "#D2222D" | "#FFBF00" | "#008000" | "gray"
-  >("gray");
-
-  useEffect(() => {
-    if (!metaInfo?.avgCareerScore) setScoreColor("gray");
-    if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 70) {
-      setScoreColor("#008000");
-    } else if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 50) {
-      setScoreColor("#FFBF00");
-    } else if (metaInfo?.avgCareerScore && metaInfo?.avgCareerScore >= 30) {
-      setScoreColor("#D2222D");
-    } else {
-      setScoreColor("gray");
-    }
-  }, [metaInfo]);
+  //artist.images[0].url
+  //metaInfo?.avgCareerScore
 
   return (
-    <ScaleHover>
-      <Box
-        className="fade-up"
-        flex={index === 2 ? 3 : "none"}
-        height={150}
-        width={150}
-        bgcolor="pink"
-        borderRadius={2}
-        sx={{
-          backgroundImage: `url(${artist.images[0].url})`,
-          backgroundSize: "cover",
-          cursor: "pointer",
-        }}
-        display="flex"
-      >
-        <Box
-          px={1}
-          borderRadius={2}
-          position="absolute"
-          right={8}
-          top={3}
-          color="white"
-          bgcolor={scoreColor}
-        >
-          <Typography fontSize={28} fontWeight="medium">
-            {metaInfo?.avgCareerScore}
-          </Typography>
-        </Box>
-        <Box
-          flex={1}
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-end"
-          borderRadius={2}
-          sx={{
-            backgroundImage: !metaInfo?.avgCareerScore
-              ? "linear-gradient(180deg, rgba(75, 75, 75, 0.9), rgba(75, 75, 75, 0.9))"
-              : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)",
-          }}
-        >
-          <Typography
-            variant="h6"
-            lineHeight={1.1}
-            sx={{
-              paddingX: 1,
-              paddingY: 0.5,
-            }}
-            color="white"
-          >
-            {index + 1}. {artist.name}
-          </Typography>
-        </Box>
-      </Box>
-    </ScaleHover>
+    <ScoreCard
+      title={artist.name}
+      score={metaInfo?.avgCareerScore}
+      imageUrl={artist.images[0].url}
+      loading={loading}
+      index={index}
+      animate
+    />
   );
 };
 
-export default ArtistCard;
+export default memo(ArtistCard);
