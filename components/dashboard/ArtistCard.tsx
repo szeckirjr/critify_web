@@ -1,7 +1,11 @@
 import { memo, useEffect, useState } from "react";
 import gsap from "gsap";
-import { Artist } from "../../lib/scraper";
+import { getCleanName } from "../../lib/scraper";
 import ScoreCard from "./ScoreCard";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { upsertArtist } from "../../redux/slices/metacritic";
+import { Box } from "@mui/material";
+import { useRouter } from "next/router";
 
 const ArtistCard = ({
   artist,
@@ -10,26 +14,32 @@ const ArtistCard = ({
   artist: SpotifyApi.ArtistObjectFull;
   index: number;
 }): JSX.Element => {
-  const [metaInfo, setMetaInfo] = useState<Artist>();
   const [loading, setLoading] = useState<boolean>(true);
-  // useEffect(() => {
-  //   getArtist(artist.name).then((res) => {
-  //     setMetaInfo(res as Artist);
-  //   });
-  // }, [artist]);
+
+  const metaInfo = useAppSelector(
+    (state) => state.metacritic.artists[getCleanName(artist.name)]
+  );
+
+  const dispatch = useAppDispatch();
+
+  const router = useRouter();
 
   useEffect(() => {
-    fetch(`/api/artist/${artist.name}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setMetaInfo(res.artist);
+    if (!metaInfo) {
+      fetch(`/api/artist/${artist.name}`, {
+        method: "GET",
       })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [artist]);
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.artist) dispatch(upsertArtist(res.artist));
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [artist.name, dispatch, metaInfo]);
 
   useEffect(() => {
     gsap.fromTo(
@@ -40,27 +50,27 @@ const ArtistCard = ({
         y: 0,
         duration: 0.5,
         ease: "slow",
-        // ease: CustomEase.create(
-        //   "custom",
-        //   "M0,0 C0,0 0.071,0.189 0.136,0.288 0.384,0.665 0.202,0.914 0.476,1.17 0.613,1.298 0.648,0.976 0.762,0.924 0.937,0.843 1,1 1,1 "
-        // ),
         stagger: 0.04,
       }
     );
   }, [artist, index]);
 
-  //artist.images[0].url
-  //metaInfo?.avgCareerScore
-
   return (
-    <ScoreCard
-      title={artist.name}
-      score={metaInfo?.avgCareerScore}
-      imageUrl={artist.images[0].url}
-      loading={loading}
-      index={index}
-      animate
-    />
+    <Box
+      onClick={() =>
+        metaInfo && router.push(`/artist/${getCleanName(artist.name)}`)
+      }
+    >
+      <ScoreCard
+        title={artist.name}
+        score={metaInfo?.avgCareerScore}
+        imageUrl={artist.images[0].url}
+        loading={loading}
+        index={index}
+        animate
+        disableHover={metaInfo ? false : true}
+      />
+    </Box>
   );
 };
 

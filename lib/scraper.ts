@@ -2,6 +2,65 @@ import { Element } from "cheerio";
 import * as cheerio from "cheerio";
 import axios from "axios";
 
+const translate = {
+  à: "a",
+  á: "a",
+  â: "a",
+  ä: "a",
+  å: "a",
+  ã: "a",
+  æ: "a",
+  ç: "c",
+  è: "e",
+  é: "e",
+  ê: "e",
+  ë: "e",
+  ì: "i",
+  í: "i",
+  î: "i",
+  ï: "i",
+  ð: "d",
+  ñ: "n",
+  ò: "o",
+  ó: "o",
+  ô: "o",
+  õ: "o",
+  ö: "o",
+  ü: "u",
+  ù: "u",
+  ú: "u",
+  û: "u",
+  ý: "y",
+  ÿ: "y",
+  À: "A",
+  Á: "A",
+  Â: "A",
+  Ä: "A",
+  Å: "A",
+  Ç: "C",
+  È: "E",
+  É: "E",
+  Ê: "E",
+  Ë: "E",
+  Ì: "I",
+  Í: "I",
+  Î: "I",
+  Ï: "I",
+  Ð: "D",
+  Ñ: "N",
+  Ò: "O",
+  Ó: "O",
+  Ô: "O",
+  Õ: "O",
+  Ö: "O",
+  Ü: "U",
+  Ù: "U",
+  Ú: "U",
+  Û: "U",
+  Ý: "Y",
+  Ÿ: "Y",
+};
+
 const artists_to_ignore = ["christopher-atkins"];
 
 const url_to_fix = {
@@ -54,49 +113,30 @@ export type Album = {
 
 export type Artist = {
   name: string;
+  cleanName: string;
   avgCareerScore: number;
   albumNames: string[];
   status: "success" | "error";
 };
 
-export function getCleanArtistName(artistName: string): string {
-  if (!artistName) return "";
-  return artistName
+export function getCleanName(name: string): string {
+  if (!name) return "";
+  const accents = /[àáâäåãæçèéêëìíîïðñòóôõöüùúûýÿÀÁÂÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖÜÙÚÛÝŸ]/g;
+  return name
     .toString()
     .toLowerCase()
-    .replace(/é/g, "e")
-    .replace(/í/g, "i")
+    .replace(accents, (match) => translate[match as keyof typeof translate])
     .replace(/[.+]/g, "")
     .replace(/[^a-zA-Z_0-9+]/g, "-")
     .replace(/--+/g, "-");
 }
 
-export function checkSameArtistName(
+export function checkSameName(
   artistName1: string,
   artistName2: string
 ): boolean {
-  return getCleanArtistName(artistName1) === getCleanArtistName(artistName2);
+  return getCleanName(artistName1) === getCleanName(artistName2);
 }
-
-export function getCleanAlbumName(albumName: string): string {
-  if (!albumName) return "";
-  return albumName
-    .toString()
-    .toLowerCase()
-    .replace(/é/g, "e")
-    .replace(/í/g, "i")
-    .replace(/[?[\]'().&:=]/g, "")
-    .replace(/[^a-zA-Z_0-9+!]/g, "-")
-    .replace(/--+/g, "-");
-}
-
-export function checkSameAlbumName(
-  albumName1: string,
-  albumName2: string
-): boolean {
-  return getCleanAlbumName(albumName1) === getCleanAlbumName(albumName2);
-}
-
 /**
  * This function takes in an album name and an artist name
  * and scrapes their metacritic page to get all critic reviews
@@ -109,9 +149,9 @@ async function getCriticReviews(albumName: string, artistName: string) {
   try {
     let url = [
       "https://www.metacritic.com/music/",
-      getCleanAlbumName(albumName),
+      getCleanName(albumName),
       "/",
-      getCleanArtistName(artistName),
+      getCleanName(artistName),
     ].join("");
     if (url in url_to_fix) {
       url = url_to_fix[url as keyof typeof url_to_fix];
@@ -174,9 +214,9 @@ async function getUserReviews(albumName: string, artistName: string) {
   try {
     let url = [
       "https://www.metacritic.com/music/",
-      getCleanAlbumName(albumName),
+      getCleanName(albumName),
       "/",
-      getCleanArtistName(artistName),
+      getCleanName(artistName),
     ].join("");
     if (url in url_to_fix) {
       url = url_to_fix[url as keyof typeof url_to_fix];
@@ -266,9 +306,9 @@ export async function getAlbumInfo(albumName: string, artistName: string) {
 
   let url = [
     "https://www.metacritic.com/music/",
-    getCleanAlbumName(albumName),
+    getCleanName(albumName),
     "/",
-    getCleanArtistName(artistName),
+    getCleanName(artistName),
   ].join("");
 
   //console.log(url);
@@ -381,19 +421,20 @@ export async function getArtist(
   artistName: string
 ): Promise<Artist | undefined> {
   //console.log("Looking for", formattedName);
-  if (artists_to_ignore.includes(getCleanArtistName(artistName))) {
+  if (artists_to_ignore.includes(getCleanName(artistName))) {
     return undefined;
   }
 
   const artistInfo: Artist = {
     name: "",
+    cleanName: "",
     avgCareerScore: 0,
     albumNames: [],
     status: "error",
   };
   const url = [
     "https://www.metacritic.com/person/",
-    getCleanArtistName(artistName),
+    getCleanName(artistName),
     "?filter-options=music",
   ].join("");
 
@@ -401,7 +442,7 @@ export async function getArtist(
     // Fetch HTML of the page we want to scrape
     const { data } = await axios.get(url, {
       headers: {
-        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Origin": "*",
       },
     });
     // Load HTML we fetched in the previous line

@@ -5,15 +5,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AlbumCard from "./AlbumCard";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { getSavedAlbums } from "../../redux/slices/spotify";
+import { MySession } from "../../types/types";
 
-const SavedAlbums = ({
-  savedAlbums,
-}: {
-  savedAlbums: SpotifyApi.SavedAlbumObject[];
-}): JSX.Element => {
+const SavedAlbums = ({ session }: { session: MySession }): JSX.Element => {
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [showAll, setShowAll] = useState<boolean>(true);
   const [parent] = useAutoAnimate({
@@ -21,10 +21,23 @@ const SavedAlbums = ({
     easing: "ease-in-out",
   });
 
+  const savedAlbums = useAppSelector((state) => state.spotify.savedAlbums);
+
+  useEffect(() => {
+    if (!savedAlbums || savedAlbums.length === 0) {
+      dispatch(getSavedAlbums(session));
+    }
+  });
+
   const albumCards = useMemo(
     () =>
       savedAlbums.map(({ album }) => (
-        <AlbumCard showAll={showAll} key={album.id} album={album} />
+        <AlbumCard
+          showAll={showAll}
+          key={album.id}
+          albumName={album.name}
+          artistName={album.artists[0].name}
+        />
       )),
     [savedAlbums, showAll]
   );

@@ -1,20 +1,28 @@
 import { memo, useEffect, useState } from "react";
 import gsap from "gsap";
-import { Album } from "../../lib/scraper";
+import { Album, getCleanName } from "../../lib/scraper";
 import ScoreCard from "./ScoreCard";
+import { useAppSelector } from "../../redux/store";
 
-const AlbumCard = ({
-  album,
-  showAll,
-}: {
-  album: SpotifyApi.AlbumObjectFull;
+type Props = {
+  albumName: string;
+  artistName: string;
   showAll: boolean;
-}): JSX.Element => {
+};
+
+const AlbumCard = ({ albumName, artistName, showAll }: Props): JSX.Element => {
   const [metaInfo, setMetaInfo] = useState<Album>();
   const [loading, setLoading] = useState<boolean>(true);
 
+  const spotifyAlbum = useAppSelector((state) =>
+    state.spotify.albums[getCleanName(artistName)]
+      ? state.spotify.albums[getCleanName(artistName)][getCleanName(albumName)]
+          .album
+      : undefined
+  );
+
   useEffect(() => {
-    fetch(`/api/album/${album.artists[0].name}/${album.name}`, {
+    fetch(`/api/album/${artistName}/${albumName}`, {
       method: "GET",
     })
       .then((res) => res.json())
@@ -24,7 +32,7 @@ const AlbumCard = ({
       .finally(() => {
         setLoading(false);
       });
-  }, [album.artists, album.name]);
+  }, [albumName, artistName]);
 
   useEffect(() => {
     gsap.fromTo(
@@ -42,9 +50,9 @@ const AlbumCard = ({
 
   return metaInfo || loading || showAll ? (
     <ScoreCard
-      title={album.name}
+      title={albumName}
       score={metaInfo?.score}
-      imageUrl={album.images[0].url}
+      imageUrl={spotifyAlbum?.images[0].url ?? ""}
       loading={loading}
       animate
     />

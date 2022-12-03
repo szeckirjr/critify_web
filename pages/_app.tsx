@@ -10,6 +10,8 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { Session } from "next-auth";
+import { Provider } from "react-redux";
+import store from "../redux/store";
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000",
@@ -56,7 +58,9 @@ function MyApp({
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
         <SessionProvider session={pageProps.session}>
-          <Component {...pageProps} />
+          <Provider store={store}>
+            <Component {...pageProps} />
+          </Provider>
         </SessionProvider>
       </ThemeProvider>
     </ApolloProvider>

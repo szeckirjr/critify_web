@@ -1,60 +1,46 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import { useRef, useState } from "react";
-import { MyUser } from "../../types/types";
+import { useEffect, useRef, useState } from "react";
+import { MySession, MyUser } from "../../types/types";
 import DashboardHeader from "./DashboardHeader";
 import SavedAlbums from "./SavedAlbums";
 import TopArtists from "./TopArtists";
-import Image from "next/image";
 import ScoreCard from "./ScoreCard";
-// import { TextPlugin } from "gsap/TextPlugin";
+import { RootState, useAppDispatch, useAppSelector } from "../../redux/store";
+import { getSpotifyUserData } from "../../redux/slices/spotify";
+import { createSelector } from "@reduxjs/toolkit";
 
 type Props = {
-  user: MyUser;
-  spotifyUser: SpotifyApi.CurrentUsersProfileResponse;
-  topArtistsLongTerm: SpotifyApi.UsersTopArtistsResponse;
-  topArtistsMediumTerm: SpotifyApi.UsersTopArtistsResponse;
-  topArtistsShortTerm: SpotifyApi.UsersTopArtistsResponse;
-  savedAlbums: SpotifyApi.UsersSavedAlbumsResponse;
+  session: MySession;
 };
 
-const Dashboard = ({
-  user,
-  spotifyUser,
-  topArtistsLongTerm,
-  topArtistsMediumTerm,
-  topArtistsShortTerm,
-  savedAlbums,
-}: Props) => {
+const Dashboard = ({ session }: Props) => {
   const theme = useTheme();
   const [type, setType] = useState<"artists" | "albums">("artists");
   const [range, setRange] = useState<"long" | "medium" | "short">("long");
 
   const mainTypeRef = useRef<HTMLSpanElement>(null);
   const subTypeRef = useRef<HTMLSpanElement>(null);
-  //   gsap.registerPlugin(TextPlugin);
+  const dispatch = useAppDispatch();
 
-  //   useEffect(() => {
-  //     console.log("type changed", type);
-  //     if (type === "artists") {
-  //       gsap.to(mainTypeRef.current, {
-  //         duration: 1,
-  //         text: "Top Artists",
-  //       });
-  //       gsap.to(subTypeRef.current, {
-  //         duration: 1,
-  //         text: "Saved Albums",
-  //       });
-  //     } else {
-  //       gsap.to(mainTypeRef.current, {
-  //         duration: 1,
-  //         text: "Saved Albums",
-  //       });
-  //       gsap.to(subTypeRef.current, {
-  //         duration: 1,
-  //         text: "Top Artists",
-  //       });
-  //     }
-  //   }, [type]);
+  const spotifyUserSelector = createSelector(
+    (state: RootState) => state.spotify,
+    (spotify) => spotify.user
+  );
+
+  const spotifyUser = useAppSelector(spotifyUserSelector);
+
+  // const spotifyUser = useAppSelector((state: RootState) => state.spotify.user);
+
+  useEffect(() => {
+    if (!spotifyUser) {
+      dispatch(getSpotifyUserData(session)).catch((err) => {
+        console.log(err);
+        // Redirect to login page
+      });
+    }
+  }, [dispatch, session, spotifyUser]);
+
+  const user = session.user as MyUser;
 
   return (
     <Stack bgcolor={theme.spotify.black} p={3} minHeight="100vh">
@@ -62,18 +48,19 @@ const Dashboard = ({
       <Stack direction="row" gap={2}>
         <ScoreCard
           size={200}
-          imageUrl={spotifyUser.images ? spotifyUser.images[0].url : ""}
+          imageUrl={spotifyUser?.images ? spotifyUser.images[0].url : ""}
           loading={false}
-          title={user.name ?? ""}
+          score={30}
+          title={session.user?.name ?? ""}
           disableHover
         />
-        <Image
+        {/* <Image
           alt="User Profile Picture"
           width={200}
           style={{ borderRadius: 12 }}
           height={200}
           src={(user && user.image) ?? ""}
-        />
+        /> */}
         <Stack>
           <Typography
             fontSize={38}
@@ -192,14 +179,9 @@ const Dashboard = ({
         )}
       </Stack>
       {type === "albums" ? (
-        <SavedAlbums savedAlbums={savedAlbums.items} />
+        <SavedAlbums session={session} />
       ) : (
-        <TopArtists
-          topArtistsLongTerm={topArtistsLongTerm.items}
-          topArtistsMediumTerm={topArtistsMediumTerm.items}
-          topArtistsShortTerm={topArtistsShortTerm.items}
-          range={range}
-        />
+        <TopArtists session={session} range={range} />
       )}
     </Stack>
   );
